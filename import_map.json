@@ -1,6 +1,6 @@
 {
   "imports": {
-    "$sb/": "../silverbullet/plug-api/",
+    "$sb/": "https://deno.land/x/silverbullet@0.9.4/plug-api/",
     "todoist": "npm:@doist/todoist-api-typescript"
   }
 }

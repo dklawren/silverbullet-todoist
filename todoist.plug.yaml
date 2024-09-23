@@ -6,7 +6,7 @@ functions:
     path: todoist.ts:getTasks
     events:
       - query:todoist
-  # addTask:
-  #   path: todoist.ts:addTask
-  #   command:
-  #     name: "Todoist: Add Task"
+  addInboxTask:
+    path: todoist.ts:addInboxTask
+    command:
+      name: "Todoist: Add Task to Inbox"

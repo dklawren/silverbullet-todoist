@@ -3,6 +3,8 @@ import { applyQuery, evalQueryExpression, liftAttributeFilter } from "$sb/lib/qu
 import { evalQueryExpression } from "$sb/lib/query_expression.ts";
 import { TodoistApi } from 'todoist';
 import { readSecrets } from "$sb/lib/secrets_page.ts";
+import { editor } from "$sb/syscalls.ts";
+
 
 export async function getTasks({ query }: QueryProviderEvent): Promise<any[]> {
   const [token] = await readSecrets(["todoistToken"]);
@@ -26,9 +28,18 @@ export async function getTasks({ query }: QueryProviderEvent): Promise<any[]> {
   return result;
 }
 
-export async function addTask(pageName: string, text: string) {
+export async function addInboxTask(pageName: string, text: string) {
   const [token] = await readSecrets(["todoistToken"]);
   const api = await new TodoistApi(token);
+
+  const task = await editor.prompt("Add to Todoist Inbox:", "");
+  if (!task) {
+    return;
+  }
+
+  const result = await api.addTask({ content: task });
+
+  await editor.flashNotification("New task added to Todoist Inbox");
 }
 
 function flattenObject(obj: any, prefix = ""): any {
