@@ -1,31 +1,47 @@
-import { flashNotification } from "https://deno.land/x/silverbullet@0.9.2/plug-api/syscalls/editor.ts";
-import { readSetting } from "https://deno.land/x/silverbullet@0.9.2/plug-api/lib/settings_page.ts";
+import type { QueryProviderEvent } from "$sb/app_event.ts";
+import { applyQuery, evalQueryExpression, liftAttributeFilter } from "$sb/lib/query.ts";
+import { evalQueryExpression } from "$sb/lib/query_expression.ts";
+import { TodoistApi } from 'todoist';
+import { readSecrets } from "$sb/lib/secrets_page.ts";
 
-const settingsKey = "todoist";
+export async function getTasks({ query }: QueryProviderEvent): Promise<any[]> {
+  const [token] = await readSecrets(["todoistToken"]);
+  const api = await new TodoistApi(token);
 
-type TodoistConfig = {
-  userCount: number,
-};
+  const filterString = liftAttributeFilter(query.filter, "filter");
 
-const defaultConfig: TodoistConfig = {
-  userCount: 1,
-}
-
-export async function getTasks() {
-  const config = { ...defaultConfig, ...(await readSetting(settingsKey, {})) };
-  const selectedUserId = 1 + Math.floor(Math.random() * config.userCount);
-  console.log(config, selectedUserId);
-
-  const result = await fetch(
-    `https://jsonplaceholder.typicode.com/users/${selectedUserId}`
-  );
-  if (result.status < 200 || result.status >= 300) {
-    throw new Error(await result.text());
+  if (!filterString) {
+    throw Error("No 'filter' specified, this is mandatory");
   }
-  const data = await result.json();
-  await flashNotification(data["name"]);
+
+  const filter: string = evalQueryExpression(filterString, {});
+
+  const tasks = await api.getTasks({filter: filter});
+
+  const result = applyQuery(
+    query,
+    tasks.map((p) => flattenObject(p)),
+  );
+
+  return result;
 }
 
-export async function addTask() {
-  await flashNotification("Adding task!");
+export async function addTask(pageName: string, text: string) {
+  const [token] = await readSecrets(["todoistToken"]);
+  const api = await new TodoistApi(token);
+}
+
+function flattenObject(obj: any, prefix = ""): any {
+  let result: any = {};
+  for (let [key, value] of Object.entries(obj)) {
+    if (prefix) {
+      key = prefix + "_" + key;
+    }
+    if (value && typeof value === "object") {
+      result = { ...result, ...flattenObject(value, key) };
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
 }

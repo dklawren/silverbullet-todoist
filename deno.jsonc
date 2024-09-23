@@ -1,21 +1,7 @@
 {
+  "importMap": "import_map.json",
   "tasks": {
-    "build": "silverbullet plug:compile -c deno.jsonc todoist.plug.yaml",
-    "watch": "silverbullet plug:compile -c deno.jsonc todoist.plug.yaml -w"
-  },
-  "lint": {
-    "rules": {
-      "exclude": ["no-explicit-any"]
-    }
-  },
-  "fmt": {
-    "exclude": [
-      "*.md",
-      "**/*.md",
-      "*.plug.js"
-    ]
-  },
-  "imports": {
-    "@silverbulletmd/silverbullet": "jsr:@silverbulletmd/silverbullet@^0.9.2"
+    "build": "silverbullet plug:compile --importmap import_map.json todoist.plug.yaml",
+    "watch": "silverbullet plug:compile -w --importmap import_map.json todoist.plug.yaml"
   }
 }

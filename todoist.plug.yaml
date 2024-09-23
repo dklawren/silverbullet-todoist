@@ -4,9 +4,9 @@ requiredPermissions:
 functions:
   getTasks:
     path: todoist.ts:getTasks
-    command:
-      name: "Todoist: Get Tasks"
-  addTask:
-    path: todoist.ts:addTask
-    command:
-      name: "Todoist: Add Task"
+    events:
+      - query:todoist
+  # addTask:
+  #   path: todoist.ts:addTask
+  #   command:
+  #     name: "Todoist: Add Task"

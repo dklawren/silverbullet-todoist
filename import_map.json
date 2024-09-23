@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "$sb/": "../silverbullet/plug-api/",
+    "todoist": "npm:@doist/todoist-api-typescript"
+  }
+}
