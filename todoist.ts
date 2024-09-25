@@ -57,11 +57,21 @@ export async function getTasks({ query }: QueryProviderEvent): Promise<any[]> {
   return result;
 }
 
-export async function addInboxTask(pageName: string, text: string) {
+export async function addInboxTask() {
   const [token] = await readSecrets(["todoistToken"]);
   const api = await new TodoistApi(token);
 
-  const task = await editor.prompt("Add to Todoist Inbox:", "");
+  // If there is selected text then prefill in the prompt
+  let text = await editor.getText();
+  const selection = await editor.getSelection();
+  if (selection.from !== selection.to) {
+    text = text.substring(selection.from, selection.to);
+  }
+  else {
+    text = "";
+  }
+
+  const task = await editor.prompt("Add to Todoist Inbox:", text);
 
   if (!task) {
     return;
